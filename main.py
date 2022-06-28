@@ -1,3 +1,4 @@
+#!/bin/python
 import os
 import sys
 import time
@@ -16,6 +17,7 @@ except IndexError:
 iostr = iostream.iostream()
 cards = iostr.openDictionary('cards', create=True)
 
+
 def save_exit(status=0, set=False, setName=None):
     if set:
         iostr.saveDictionary(set, setName)
@@ -26,7 +28,8 @@ def save_exit(status=0, set=False, setName=None):
 def training(set, inLoop):
     for x, i in enumerate(set):
         try:
-            reliability = cards[setName]['cardData'][i][0] / (cards[setName]['cardData'][i][0] + cards[setName]['cardData'][i][1]) * 100
+            reliability = cards[setName]['cardData'][i][0] / (
+                    cards[setName]['cardData'][i][0] + cards[setName]['cardData'][i][1]) * 100
         except ZeroDivisionError:
             reliability = 0
         if reliability <= cards[setName]['options'][0]:
@@ -75,31 +78,18 @@ def training(set, inLoop):
                         wrongAnswers.append(i)
 
 
-
-
-
-if mode == "train":
+def getArgument(argumentNr, usage, exitStatus=0):
     try:
-        setName = sys.argv[2]
+        return sys.argv[argumentNr]
     except IndexError:
-        print("argument 2 is missing:\n"
-              "argument 2: the name of the set")
-        sys.exit(1)
-    error = 0
+        print(f"argument {argumentNr} is missing\n"
+              f"argument {argumentNr}: {usage}")
+        sys.exit(exitStatus)
 
-    set = iostr.openDictionary(setName)
-    if set is None:
-        print("Couldn't load that set!")
-        sys.exit(1)
-    reversed_definitions = False
-    try:
-        if sys.argv[3] or sys.argv[3] == "reversed_definitions":
-            reversed_definitions = True
-    except:
-        pass
 
+def setSetup(setName):
     try:
-        if not cards[setName] or not cards[setName]['options']:
+        if not cards[setName]:
             print("This set isn't configured yet, let's set it up.")
             options = []
             """
@@ -117,13 +107,32 @@ if mode == "train":
                 options.append(100)
             print("setup completed")
 
-            cards[setName] = {'options': options, 'cardData': {}}
+            cards[setName] = {'options': options, 'cardData': {}, 'folders': []}
+            set = iostr.openDictionary(setName)
             for i in set:
                 cards[setName]['cardData'][i] = [0, 0]  # correct answers, wrong answers
             print("\n")
             iostr.saveDictionary(cards, 'cards')
     except KeyError:
         pass
+
+
+if mode == "train":
+    setName = getArgument(2, "the name of the set")
+    error = 0
+
+    set = iostr.openDictionary(setName)
+    if set is None:
+        print("Couldn't load that set!")
+        sys.exit(1)
+    reversed_definitions = False
+    try:
+        if sys.argv[3] or sys.argv[3] == "reversed":
+            reversed_definitions = True
+    except:
+        pass
+
+    setSetup(setName)
 
     cards[setName]["lastAccessed"] = time.time()
     try:
@@ -149,13 +158,6 @@ if mode == "train":
         save_exit(set=False)
         print("Your progress has been saved.")
         sys.exit(1)
-
-
-
-
-
-
-
 
 if mode == "new":
     print("Title")
@@ -210,27 +212,73 @@ elif mode.lower() == "textfile":
         save_exit(0, True, set)
 
 elif mode.lower() == "resetset":
-    print(f"Do you really want to delete your configuration for the set {sys.argv[1]} and reset your training data?")
+    print(
+        f"Do you really want to delete your configuration for the set {getArgument(2, 'the name of the set')} and reset your training data?")
     if input("Yes: [Y y] / No: anything else\n").lower() == "y":
         print("You answered yes")
-        cards[sys.argv[2]] = False
+        cards[getArgument(2, "the name of the set")] = False
         save_exit()
     else:
         print("You didn't answer y. Your configuration won't be deleted.")
         save_exit(1)
 
 elif mode == "list":
-    print("----SETS----")
+    print("-----------SETS-----------")
     sets = {}
     for i in cards:
         lastAccessed = cards[i]["lastAccessed"]
         sets[lastAccessed] = i
-    sortedSets=sorted(sets, reverse=True)
+    sortedSets = sorted(sets, reverse=True)
 
     for output in sortedSets:
         print(termcolor.colored(sets[output], "blue"), "             ", termcolor.colored(time.ctime(output), "green"))
 
-elif mode == "folder":
-    mode=sys.argv[2]
+elif mode == "folders":
+    mode = getArgument(2, "create - add")
+    folderName = getArgument(3, "the name of the folder")
+    folders = iostr.openDictionary("folders")
+
     if mode == "create" or mode == "new":
-        iostr.openDictionary('folders', True)
+        folders = iostr.openDictionary('folders', True)
+        folders[folderName] = []
+        iostr.saveDictionary(folders, "folders")
+        print(f"Folder {folderName} has been created")
+        sys.exit(0)
+
+    elif mode == "add":
+        setName = getArgument(4, "the name of the set")
+        setSetup(setName)
+        print(f"adding {setName} to your folder {folderName}...")
+        if folderName in cards[setName]['folders']:
+            print("That set is already in that folder. Won't add it.")
+            sys.exit(1)
+        cards[setName]['folders'].append(folderName)
+
+        if folders is None:
+            print("The file folders.json is not existing. Please first create a folder and then add a set to it.")
+            sys.exit(1)
+        try:
+            if setName not in folders[folderName]:
+                folders[folderName].append(setName)
+        except KeyError:
+            print(f"That folder doesn't exist. Please first create it: ./main.py folders create {folderName}")
+            cards[setName]['folders'].remove(folderName)
+            sys.exit(1)
+
+        iostr.saveDictionary(folders, 'folders')
+        iostr.saveDictionary(cards, 'cards')
+        print(f"Your set {setName} has been added to the folder {folderName}.")
+        sys.exit(0)
+
+    elif mode == "list":
+        folderName = getArgument(3, "the name of the folder")
+        print("-----------SETS-----------")
+        sets = {}
+        for i in folders[folderName]:
+            lastAccessed = cards[i]["lastAccessed"]
+            sets[lastAccessed] = i
+        sortedSets = sorted(sets, reverse=True)
+
+        for output in sortedSets:
+            print(termcolor.colored(sets[output], "blue"), "             ",
+                  termcolor.colored(time.ctime(output), "green"))
