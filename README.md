@@ -7,3 +7,5 @@ There is no documentation yet but you can look into the code and find out yourse
 folders for main.py list
 
 machine learning
+
+GUI
