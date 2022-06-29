@@ -18,9 +18,9 @@ iostr = iostream.iostream()
 cards = iostr.openDictionary('cards', create=True)
 
 
-def save_exit(status=0, set=False, setName=None):
-    if set:
-        iostr.saveDictionary(set, setName)
+def save_exit(status=0, save_set=False, setName=None, setData=None):
+    if save_set:
+        iostr.saveDictionary(setData, setName)
     iostr.saveDictionary(cards, 'cards')
     sys.exit(status)
 
@@ -87,7 +87,7 @@ def getArgument(argumentNr, usage, exitStatus=0):
         sys.exit(exitStatus)
 
 
-def setSetup(setName):
+def setSetup(setName, set):
     try:
         if not cards[setName]:
             print("This set isn't configured yet, let's set it up.")
@@ -108,7 +108,6 @@ def setSetup(setName):
             print("setup completed")
 
             cards[setName] = {'options': options, 'cardData': {}, 'folders': []}
-            set = iostr.openDictionary(setName)
             for i in set:
                 cards[setName]['cardData'][i] = [0, 0]  # correct answers, wrong answers
             print("\n")
@@ -132,7 +131,7 @@ if mode == "train":
     except:
         pass
 
-    setSetup(setName)
+    setSetup(setName, set)
 
     cards[setName]["lastAccessed"] = time.time()
     try:
@@ -150,12 +149,12 @@ if mode == "train":
             else:
                 running = False
 
-        save_exit(set=False)
+        save_exit(save_set=False)
         print("Your progress has been saved.")
 
     except KeyboardInterrupt:
         print("\nKeyboardInterrupt exception has occurred! Saving progress..")
-        save_exit(set=False)
+        save_exit(save_set=False)
         print("Your progress has been saved.")
         sys.exit(1)
 
@@ -209,7 +208,7 @@ elif mode.lower() == "textfile":
         set = input()
         print(f"Saving the new set which has {x} definitions under the name {set}...")
         cards[set] = False
-        save_exit(0, True, set)
+        save_exit(0, True, setName=set, setData=words)
 
 elif mode.lower() == "resetset":
     print(
@@ -247,7 +246,7 @@ elif mode == "folders":
 
     elif mode == "add":
         setName = getArgument(4, "the name of the set")
-        setSetup(setName)
+        setSetup(setName, set=iostr.openDictionary(setName))
         print(f"adding {setName} to your folder {folderName}...")
         if folderName in cards[setName]['folders']:
             print("That set is already in that folder. Won't add it.")

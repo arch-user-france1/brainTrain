@@ -25,14 +25,14 @@ class iostream():
         try:
             with open(f"{fileName}.json") as f:
                 data = json.load(f)
-            return data
+                return data
         except FileNotFoundError:
             if create:
                 data = {}
                 self.saveDictionary(dictionary=data, fileName=fileName)
+                return data
             else:
                 return None
-        return data
 
     def shuffleDictionary(self, dictionary):
         import random
