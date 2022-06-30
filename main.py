@@ -27,9 +27,9 @@ def save_exit(status=0, save_set=False, setName=None, setData=None):
 
 def training(set, inLoop):
     if inLoop:
-        enumMe=wrongAnswers
+        enumMe = wrongAnswers
     else:
-        enumMe=set
+        enumMe = set
     for x, i in enumerate(enumMe):
         try:
             reliability = cards[setName]['cardData'][i][0] / (
@@ -38,9 +38,9 @@ def training(set, inLoop):
             reliability = 0
         if reliability <= cards[setName]['options'][0]:
             if not reversed_definitions:
-                print(x, ". ", i, end="   ")
+                print(x+1, ". ", i, end="   ")
             else:
-                print(x, ". ", set[i], end="   ")
+                print(x+1, ". ", set[i], end="   ")
             try:
                 answer = input()
             except UnicodeEncodeError:
@@ -240,11 +240,30 @@ elif mode == "list":
         print(termcolor.colored(sets[output], "blue"), "             ", termcolor.colored(time.ctime(output), "green"))
 
 elif mode == "folders":
-    mode = getArgument(2, "create - add")
-    folderName = getArgument(3, "the name of the folder")
     folders = iostr.openDictionary("folders")
 
+
+    def list_folders():
+        folderName = getArgument(3, "the name of the new folder")
+        print("-----------SETS-----------")
+        sets = {}
+        for i in folders[folderName]:
+            lastAccessed = cards[i]["lastAccessed"]
+            sets[lastAccessed] = i
+        sortedSets = sorted(sets, reverse=True)
+
+        for output in sortedSets:
+            print(termcolor.colored(sets[output], "blue"), "             ",
+                  termcolor.colored(time.ctime(output), "green"))
+
+
+    if len(sys.argv) == 3:
+        list_folders()
+
+    mode = getArgument(2, "new, add, list")
+
     if mode == "create" or mode == "new":
+        folderName = getArgument(3, "the name of the new folder")
         folders = iostr.openDictionary('folders', True)
         folders[folderName] = []
         iostr.saveDictionary(folders, "folders")
@@ -252,7 +271,8 @@ elif mode == "folders":
         sys.exit(0)
 
     elif mode == "add":
-        setName = getArgument(4, "the name of the set")
+        folderName = getArgument(4, "the name of the folder")
+        setName = getArgument(3, "the name of the set")
         setSetup(setName, set=iostr.openDictionary(setName))
         print(f"adding {setName} to your folder {folderName}...")
         if folderName in cards[setName]['folders']:
@@ -274,17 +294,9 @@ elif mode == "folders":
         iostr.saveDictionary(folders, 'folders')
         iostr.saveDictionary(cards, 'cards')
         print(f"Your set {setName} has been added to the folder {folderName}.")
+        sleep(0.2)
+        list_folders()
         sys.exit(0)
 
     elif mode == "list":
-        folderName = getArgument(3, "the name of the folder")
-        print("-----------SETS-----------")
-        sets = {}
-        for i in folders[folderName]:
-            lastAccessed = cards[i]["lastAccessed"]
-            sets[lastAccessed] = i
-        sortedSets = sorted(sets, reverse=True)
-
-        for output in sortedSets:
-            print(termcolor.colored(sets[output], "blue"), "             ",
-                  termcolor.colored(time.ctime(output), "green"))
+        list_folders()
