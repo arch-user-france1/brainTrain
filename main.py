@@ -26,7 +26,11 @@ def save_exit(status=0, save_set=False, setName=None, setData=None):
 
 
 def training(set, inLoop):
-    for x, i in enumerate(set):
+    if inLoop:
+        enumMe=wrongAnswers
+    else:
+        enumMe=set
+    for x, i in enumerate(enumMe):
         try:
             reliability = cards[setName]['cardData'][i][0] / (
                     cards[setName]['cardData'][i][0] + cards[setName]['cardData'][i][1]) * 100
@@ -143,8 +147,8 @@ if mode == "train":
         while running:
             if len(wrongAnswers) > 0:
                 random.shuffle(wrongAnswers)
-                training(set, inLoop=True)
                 os.system("clear 2>/dev/zero")
+                training(set, inLoop=True)
                 sleep(0.5)
             else:
                 running = False
@@ -225,8 +229,11 @@ elif mode == "list":
     print("-----------SETS-----------")
     sets = {}
     for i in cards:
-        lastAccessed = cards[i]["lastAccessed"]
-        sets[lastAccessed] = i
+        try:
+            lastAccessed = cards[i]["lastAccessed"]
+            sets[lastAccessed] = i
+        except:
+            print(f"Warning: invalid set {i}")
     sortedSets = sorted(sets, reverse=True)
 
     for output in sortedSets:
