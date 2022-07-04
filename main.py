@@ -32,26 +32,26 @@ def training(set, inLoop):
         enumMe = set
     for x, i in enumerate(enumMe):
         try:
-            reliability = cards[setName]['cardData'][i][0] / (
-                    cards[setName]['cardData'][i][0] + cards[setName]['cardData'][i][1]) * 100
+            reliability = cards[setName]['cardData'][i][0] / (cards[setName]['cardData'][i][0] + cards[setName]['cardData'][i][1]) * 100
         except ZeroDivisionError:
             reliability = 0
         if reliability <= cards[setName]['options'][0]:
             if not reversed_definitions:
-                print(x+1, ". ", i, end="   ")
+                print(x + 1, ". ", i, end="   ")
             else:
-                print(x+1, ". ", set[i], end="   ")
+                print(x + 1, ". ", set[i], end="   ")
             try:
                 answer = input()
             except UnicodeEncodeError:
                 print("UnicodeDecodeError :/   try using a different shell or submit a PR")
                 answer = ""
 
-            if reversed_definitions and answer == i:
-                correct = True
+            if not reversed_definitions:
+                correct = iostr.checkAnswer(answer, set[i])
             else:
-                correct = False
-            if answer == set[i] or correct:
+                correct = iostr.checkAnswer(answer, i)
+
+            if correct:
                 if not reversed_definitions:
                     print(termcolor.colored(set[i], "green"))
                 else:

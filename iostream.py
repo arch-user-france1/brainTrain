@@ -49,3 +49,32 @@ class iostream():
                     return answer
             print("Possible answers are ", possibleAnswers, ", but you answered ", answer,
                   ". Please answer to one of the possible answers.")
+
+    def tolerateSemicolon(self, string):
+        if ';' in string:
+            string = string.replace(';', '')
+            string = string.split()
+        return string
+
+    def checkAnswer(self, answer, correctAnswer):
+        correct = True
+        correctAnswer = self.tolerateSemicolon(correctAnswer)
+        if type(correctAnswer) == list:
+            isArray=True
+        else:
+            isArray=False
+        if isArray:
+            answer = self.tolerateSemicolon(answer)
+            print(answer)
+
+            for i in answer:
+                print(i)
+                if i not in correctAnswer:
+                    print(f"{i} is not in {correctAnswer}")
+                    correct = False
+                    break
+        else:
+            if answer != correctAnswer:
+                correct = False
+
+        return correct
