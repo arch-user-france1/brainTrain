@@ -6,6 +6,15 @@ import iostream
 import termcolor
 from time import sleep
 import random
+#import gi
+
+#gi.require_version('Gtk', '3.0')
+#from gi.repository import Gtk
+
+#win = Gtk.Window()
+#win.connect("destroy", Gtk.main_quit)
+#win.show()
+#Gtk.main()
 
 try:
     mode = sys.argv[1]
@@ -32,10 +41,11 @@ def training(set, inLoop):
         enumMe = set
     for x, i in enumerate(enumMe):
         try:
-            reliability = cards[setName]['cardData'][i][0] / (cards[setName]['cardData'][i][0] + cards[setName]['cardData'][i][1]) * 100
+            reliability = cards[setName]['cardData'][i][0] / (
+                    cards[setName]['cardData'][i][0] + cards[setName]['cardData'][i][1]) * 100
         except ZeroDivisionError:
             reliability = 0
-        if reliability <= cards[setName]['options'][0]:
+        if reliability <= cards[setName]['options'][0] and cards[setName]['cardData'][i][0] < 4:
             if not reversed_definitions:
                 print(x + 1, ". ", i, end="   ")
             else:
@@ -109,6 +119,12 @@ def setSetup(setName, set):
                 options.append(90)
             elif answer == "perfect":
                 options.append(100)
+            print("Ignore missing/too many whitespaces [yes/no]?")
+            answer = iostr.askFor(["yes", 'y', "no", 'n'], firstAsk=False)
+            if answer == "yes" or "y":
+                options.append(True)
+            else:
+                options.append(False)
             print("setup completed")
 
             cards[setName] = {'options': options, 'cardData': {}, 'folders': []}
@@ -237,7 +253,25 @@ elif mode == "list":
     sortedSets = sorted(sets, reverse=True)
 
     for output in sortedSets:
-        print(termcolor.colored(sets[output], "blue"), "             ", termcolor.colored(time.ctime(output), "green"))
+        output = sets[output]
+        nameLength = len(output)
+        if nameLength > 27:
+            outputArr = output.split()
+            output = ""
+            for j,x in enumerate(outputArr):
+                if j < 27:
+                    output += x
+                else:
+                    break
+            output += "..."
+            nameLength = len(output)
+
+        spaces = 32 - nameLength
+
+        print(termcolor.colored(output, "blue"), end="")
+        for j in range(spaces):
+            print(end=" ")
+        print(termcolor.colored(time.ctime(cards[i]['lastAccessed']), "green"))
 
 elif mode == "folders":
     folders = iostr.openDictionary("folders")

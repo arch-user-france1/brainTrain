@@ -40,8 +40,9 @@ class iostream():
         random.shuffle(tuple_list)
         return dict(tuple_list)
 
-    def askFor(self, possibleAnswers):
-        print("Possible answers are: ", possibleAnswers)
+    def askFor(self, possibleAnswers, firstAsk=True):
+        if firstAsk:
+            print("Possible answers are: ", possibleAnswers)
         while True:
             answer = input()
             for i in possibleAnswers:
