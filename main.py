@@ -34,64 +34,6 @@ def save_exit(status=0, save_set=False, setName=None, setData=None):
     sys.exit(status)
 
 
-def training(set, inLoop):
-    if inLoop:
-        enumMe = wrongAnswers
-    else:
-        enumMe = set
-    for x, i in enumerate(enumMe):
-        try:
-            reliability = cards[setName]['cardData'][i][0] / (
-                    cards[setName]['cardData'][i][0] + cards[setName]['cardData'][i][1]) * 100
-        except ZeroDivisionError:
-            reliability = 0
-        if reliability <= cards[setName]['options'][0] and cards[setName]['cardData'][i][0] < 4:
-            if not reversed_definitions:
-                print(x + 1, ". ", i, end="   ")
-            else:
-                print(x + 1, ". ", set[i], end="   ")
-            try:
-                answer = input()
-            except UnicodeEncodeError:
-                print("UnicodeDecodeError :/   try using a different shell or submit a PR")
-                answer = ""
-
-            if not reversed_definitions:
-                correct = iostr.checkAnswer(answer, set[i])
-            else:
-                correct = iostr.checkAnswer(answer, i)
-
-            if correct:
-                if not reversed_definitions:
-                    print(termcolor.colored(set[i], "green"))
-                else:
-                    print(termcolor.colored(i, "green"))
-                print("Correct!")
-                cards[setName]['cardData'][i][0] += 1
-                if inLoop:
-                    wrongAnswers.remove(i)
-                sleep(0.3)
-            else:
-                print("Correct answer would've been:")
-                if not reversed_definitions:
-                    print(termcolor.colored(set[i], "red"))
-                else:
-                    print(termcolor.colored(i, "red"))
-                print(
-                    f"Press {termcolor.colored('enter', 'red')} to continue, type {termcolor.colored('correct', 'green')} if it was correct")
-                correct = input()
-                if correct == "correct":
-                    print("You typed correct\n")
-                    cards[setName]['cardData'][i][0] += 1
-                    if inLoop:
-                        wrongAnswers.remove(i)
-                else:
-                    print("You didn't type correct\n")
-                    cards[setName]['cardData'][i][1] += 1
-                    if not inLoop:
-                        wrongAnswers.append(i)
-
-
 def getArgument(argumentNr, usage, exitStatus=0):
     try:
         return sys.argv[argumentNr]
@@ -137,6 +79,101 @@ def setSetup(setName, set):
 
 
 if mode == "train":
+
+    def training(set, inLoop):
+        if inLoop:
+            enumMe = wrongAnswers
+        else:
+            enumMe = set
+        for x, i in enumerate(enumMe):
+            try:
+                reliability = cards[setName]['cardData'][i][0] / (
+                        cards[setName]['cardData'][i][0] + cards[setName]['cardData'][i][1]) * 100
+            except ZeroDivisionError:
+                reliability = 0
+            if reliability <= cards[setName]['options'][0] and cards[setName]['cardData'][i][0] < 4:
+                if not reversed_definitions:
+                    print(x + 1, ". ", i, end="   ")
+                else:
+                    print(x + 1, ". ", set[i], end="   ")
+                try:
+                    answer = input()
+                except UnicodeEncodeError:
+                    print("UnicodeDecodeError :/   try using a different shell or submit a PR")
+                    answer = ""
+
+                if not reversed_definitions:
+                    correct = iostr.checkAnswer(answer, set[i])
+                else:
+                    correct = iostr.checkAnswer(answer, i)
+
+                if correct:
+                    if not reversed_definitions:
+                        print(termcolor.colored(set[i], "green"))
+                    else:
+                        print(termcolor.colored(i, "green"))
+                    print("Correct!")
+                    cards[setName]['cardData'][i][0] += 1
+                    if inLoop:
+                        wrongAnswers.remove(i)
+                    sleep(0.3)
+                else:
+                    print("Correct answer would've been:")
+                    if not reversed_definitions:
+                        output = set[i]
+                    else:
+                        output = i
+
+                    outputArr = list(output)
+                    answerArr = list(answer)
+                    difference = len(outputArr) - len(answerArr)
+                    if difference != 0:
+                        if difference < 0:
+                            iterate = len(outputArr)
+                            tooLong = "answer"
+                        elif difference > 0:
+                            iterate = len(answerArr)
+                            tooLong = "output"
+                    else:
+                        tooLong = ''
+                        iterate = len(answerArr)
+
+                    for n in range(iterate):
+                        if outputArr[n] == answerArr[n]:
+                            print(termcolor.colored(answerArr[n], 'green'), end="")
+                        else:
+                            print(termcolor.colored(answerArr[n], 'red'), end="")
+
+                    if tooLong == "anwer":
+                        for m in range(len(answerArr) - iterate):
+                            idx = m + iterate
+                            print(termcolor.colored(answerArr[idx], 'red'), end="")
+                        del idx, m
+                    elif tooLong == "output":
+                        for m in range(len(outputArr) - iterate):
+                            idx = m + iterate
+                            print(termcolor.colored(output[idx], 'blue'), end="")
+
+                        del idx, m
+                    del iterate, n, difference, outputArr, output, answerArr
+
+                    print('\n'
+                        f"Press {termcolor.colored('enter', 'red')} to continue, type {termcolor.colored('correct', 'green')} if it was correct")
+                    correct = input()
+                    if correct == "correct":
+                        print(f"You typed {termcolor.colored('correct', 'green')}\n")
+                        cards[setName]['cardData'][i][0] += 1
+                        if inLoop:
+                            wrongAnswers.remove(i)
+                    else:
+                        print('\n')
+                        #print("You didn't type correct\n")
+                        cards[setName]['cardData'][i][1] += 1
+                        if not inLoop:
+                            wrongAnswers.append(i)
+
+
+
     setName = getArgument(2, "the name of the set")
     error = 0
 
