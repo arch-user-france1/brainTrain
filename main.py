@@ -142,17 +142,17 @@ if mode == "train":
                         if outputArr[n] == answerArr[n]:
                             print(termcolor.colored(answerArr[n], 'green'), end="")
                         else:
-                            print(termcolor.colored(answerArr[n], 'red'), end="")
+                            print(termcolor.colored(outputArr[n], 'red'), end="")
 
                     if tooLong == "anwer":
                         for m in range(len(answerArr) - iterate):
                             idx = m + iterate
-                            print(termcolor.colored(answerArr[idx], 'red'), end="")
+                            print(termcolor.colored(outputArr[idx], 'red'), end="")
                         del idx, m
                     elif tooLong == "output":
                         for m in range(len(outputArr) - iterate):
                             idx = m + iterate
-                            print(termcolor.colored(output[idx], 'blue'), end="")
+                            print(termcolor.colored(outputArr[idx], 'blue'), end="")
 
                         del idx, m
                     del iterate, n, difference, outputArr, output, answerArr
@@ -166,7 +166,7 @@ if mode == "train":
                         if inLoop:
                             wrongAnswers.remove(i)
                     else:
-                        print('\n')
+                        print()
                         #print("You didn't type correct\n")
                         cards[setName]['cardData'][i][1] += 1
                         if not inLoop:
