@@ -101,6 +101,7 @@ if mode == "train":
                 except UnicodeEncodeError:
                     print("UnicodeDecodeError :/   try using a different shell or submit a PR")
                     answer = ""
+                answer.replace('’', '\'')  # Apple software seems to replace the character ' with ’
 
                 if not reversed_definitions:
                     correct = iostr.checkAnswer(answer, set[i])
