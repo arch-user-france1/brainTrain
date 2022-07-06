@@ -155,7 +155,10 @@ if mode == "train":
                             print(termcolor.colored(outputArr[idx], 'blue'), end="")
 
                         del idx, m
-                    del iterate, n, difference, outputArr, output, answerArr
+                    try:
+                        del difference, outputArr, output, answerArr
+                    except UnboundLocalError:
+                        pass
 
                     print('\n'
                         f"Press {termcolor.colored('enter', 'red')} to continue, type {termcolor.colored('correct', 'green')} if it was correct")
