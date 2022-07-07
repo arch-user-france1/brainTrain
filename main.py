@@ -101,7 +101,7 @@ if mode == "train":
                 except UnicodeEncodeError:
                     print("UnicodeDecodeError :/   try using a different shell or submit a PR")
                     answer = ""
-                answer.replace('’', '\'')  # Apple software seems to replace the character ' with ’
+                answer.replace('’', '\'')  # Apple software seems to replace the character ' with ’ but it still doesn't seem to work if I replace it back :(
 
                 if not reversed_definitions:
                     correct = iostr.checkAnswer(answer, set[i])
@@ -257,6 +257,7 @@ elif mode.lower() == "textfile":
     with open(sys.argv[2]) as f:
         for i in f:
             i = i.rstrip()
+            i = i.replace('’', '\'')  # Apple software seems to replace the character ' with ’
             if not last:
                 last = i
                 x += 1
@@ -320,7 +321,7 @@ elif mode == "folders":
 
     def list_folders():
         folderName = getArgument(3, "the name of the new folder")
-        print("-----------SETS-----------")
+        print("----------------------SETS----------------------")
         sets = {}
         for i in folders[folderName]:
             lastAccessed = cards[i]["lastAccessed"]
@@ -328,8 +329,25 @@ elif mode == "folders":
         sortedSets = sorted(sets, reverse=True)
 
         for output in sortedSets:
-            print(termcolor.colored(sets[output], "blue"), "             ",
-                  termcolor.colored(time.ctime(output), "green"))
+            output = sets[output]
+            nameLength = len(output)
+            if nameLength > 27:
+                outputArr = output.split()
+                output = ""
+                for j, x in enumerate(outputArr):
+                    if j < 27:
+                        output += x
+                    else:
+                        break
+                output += "..."
+                nameLength = len(output)
+
+            spaces = 32 - nameLength
+
+            print(termcolor.colored(output, "blue"), end="")
+            for j in range(spaces):
+                print(end=" ")
+            print(termcolor.colored(time.ctime(cards[i]['lastAccessed']), "green"))
 
 
     if len(sys.argv) == 3:

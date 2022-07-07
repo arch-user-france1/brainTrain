@@ -66,12 +66,9 @@ class iostream():
             isArray=False
         if isArray:
             answer = self.tolerateSemicolon(answer)
-            print(answer)
 
             for i in answer:
-                print(i)
                 if i not in correctAnswer:
-                    print(f"{i} is not in {correctAnswer}")
                     correct = False
                     break
         else:
