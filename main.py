@@ -54,7 +54,7 @@ def setSetup(setName, set):
             options[0]: reliability 
             """
             print("How good do you want to be at the set?")
-            answer = iostr.askFor(["bad", "medium", "good", "perfect"])
+            answer = iostr.askFor(["bad", "medium", "good", "perfect", "never_stop_asking"])
             if answer == "bad":
                 options.append(40)
             elif answer == "medium":
@@ -63,7 +63,9 @@ def setSetup(setName, set):
                 options.append(90)
             elif answer == "perfect":
                 options.append(100)
-            print("Ignore missing/too many whitespaces [yes/no]?")
+            elif answer == "never_stop_asking":
+                options.append(101)
+            print("Ignore missing/too many spaces [yes/no]?  UNIMPLEMENTED")
             answer = iostr.askFor(["yes", 'y', "no", 'n'], firstAsk=False)
             if answer == "yes" or "y":
                 options.append(True)
@@ -105,6 +107,10 @@ if mode == "train":
                     answer = ""
                 answer.replace('’',
                                '\'')  # Apple software seems to replace the character ' with ’ but it still doesn't seem to work if I replace it back :(
+                if not reversed_definitions:
+                    answer = iostr.tolerateSentence(answer, set[i])[1]
+                else:
+                    answer = iostr.tolerateSentence(answer, i)[1]
 
                 if not reversed_definitions:
                     correct = iostr.checkAnswer(answer, set[i])
