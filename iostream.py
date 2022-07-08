@@ -1,5 +1,7 @@
 import io
 
+import numpy.core.defchararray
+
 
 class iostream():
     def addWords(self):
@@ -56,6 +58,19 @@ class iostream():
             string = string.replace(';', '')
             string = string.split()
         return string
+
+    def tolerateSentence(self, string, string2):
+        sentence = False
+        if '.' in string or '!' in string or '?' in string:
+            if str(string2[0]).isupper():
+                sentence = True
+                stringArr = list(string)
+                string = ''
+                string += stringArr[0]
+                string = string.upper()
+                for i in range(len(stringArr)-1):
+                    string += stringArr[i+1]
+        return sentence, string
 
     def checkAnswer(self, answer, correctAnswer):
         correct = True
