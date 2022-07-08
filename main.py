@@ -1,20 +1,22 @@
 #!/bin/python
 import os
+import platform
 import sys
 import time
 import iostream
 import termcolor
 from time import sleep
 import random
-#import gi
 
-#gi.require_version('Gtk', '3.0')
-#from gi.repository import Gtk
+# import gi
 
-#win = Gtk.Window()
-#win.connect("destroy", Gtk.main_quit)
-#win.show()
-#Gtk.main()
+# gi.require_version('Gtk', '3.0')
+# from gi.repository import Gtk
+
+# win = Gtk.Window()
+# win.connect("destroy", Gtk.main_quit)
+# win.show()
+# Gtk.main()
 
 try:
     mode = sys.argv[1]
@@ -101,7 +103,8 @@ if mode == "train":
                 except UnicodeEncodeError:
                     print("UnicodeDecodeError :/   try using a different shell or submit a PR")
                     answer = ""
-                answer.replace('’', '\'')  # Apple software seems to replace the character ' with ’ but it still doesn't seem to work if I replace it back :(
+                answer.replace('’',
+                               '\'')  # Apple software seems to replace the character ' with ’ but it still doesn't seem to work if I replace it back :(
 
                 if not reversed_definitions:
                     correct = iostr.checkAnswer(answer, set[i])
@@ -162,7 +165,7 @@ if mode == "train":
                         pass
 
                     print('\n'
-                        f"Press {termcolor.colored('enter', 'red')} to continue, type {termcolor.colored('correct', 'green')} if it was correct")
+                          f"Press {termcolor.colored('enter', 'red')} to continue, type {termcolor.colored('correct', 'green')} if it was correct")
                     correct = input()
                     if correct == "correct":
                         print(f"You typed {termcolor.colored('correct', 'green')}\n")
@@ -171,11 +174,10 @@ if mode == "train":
                             wrongAnswers.remove(i)
                     else:
                         print()
-                        #print("You didn't type correct\n")
+                        # print("You didn't type correct\n")
                         cards[setName]['cardData'][i][1] += 1
                         if not inLoop:
                             wrongAnswers.append(i)
-
 
 
     setName = getArgument(2, "the name of the set")
@@ -204,6 +206,9 @@ if mode == "train":
         while running:
             if len(wrongAnswers) > 0:
                 random.shuffle(wrongAnswers)
+                if platform.system().lower() == "windows":  # untested code - no official windows support!
+                    for i in range(os.get_terminal_size()[1]):
+                        print("\n", flush=True)
                 os.system("clear 2>/dev/zero")
                 training(set, inLoop=True)
                 sleep(0.5)
@@ -257,7 +262,8 @@ elif mode.lower() == "textfile":
     with open(sys.argv[2]) as f:
         for i in f:
             i = i.rstrip()
-            i = i.replace('’', '\'')  # Apple software seems to replace the character ' with ’
+            i = i.replace('’',
+                          "'")  # Apple software seems to replace the character ' with ’ but this doesn't seem to fix it.
             if not last:
                 last = i
                 x += 1
@@ -300,7 +306,7 @@ elif mode == "list":
         if nameLength > 27:
             outputArr = output.split()
             output = ""
-            for j,x in enumerate(outputArr):
+            for j, x in enumerate(outputArr):
                 if j < 27:
                     output += x
                 else:
@@ -320,34 +326,42 @@ elif mode == "folders":
 
 
     def list_folders():
-        folderName = getArgument(3, "the name of the new folder")
-        print("----------------------SETS----------------------")
-        sets = {}
-        for i in folders[folderName]:
-            lastAccessed = cards[i]["lastAccessed"]
-            sets[lastAccessed] = i
-        sortedSets = sorted(sets, reverse=True)
+        try:
+            folderName = sys.argv[3]
+        except:
+            folderName = None
+        if folderName is not None:
+            print("----------------------SETS----------------------")
+            sets = {}
+            for i in folders[folderName]:
+                lastAccessed = cards[i]["lastAccessed"]
+                sets[lastAccessed] = i
+            sortedSets = sorted(sets, reverse=True)
 
-        for output in sortedSets:
-            output = sets[output]
-            nameLength = len(output)
-            if nameLength > 27:
-                outputArr = output.split()
-                output = ""
-                for j, x in enumerate(outputArr):
-                    if j < 27:
-                        output += x
-                    else:
-                        break
-                output += "..."
+            for output in sortedSets:
+                output = sets[output]
                 nameLength = len(output)
+                if nameLength > 27:
+                    outputArr = output.split()
+                    output = ""
+                    for j, x in enumerate(outputArr):
+                        if j < 27:
+                            output += x
+                        else:
+                            break
+                    output += "..."
+                    nameLength = len(output)
 
-            spaces = 32 - nameLength
+                spaces = 32 - nameLength
 
-            print(termcolor.colored(output, "blue"), end="")
-            for j in range(spaces):
-                print(end=" ")
-            print(termcolor.colored(time.ctime(cards[i]['lastAccessed']), "green"))
+                print(termcolor.colored(output, "blue"), end="")
+                for j in range(spaces):
+                    print(end=" ")
+                print(termcolor.colored(time.ctime(cards[i]['lastAccessed']), "green"))
+        else:
+            print("---------------------FOLDERS---------------------")
+            for i in folders:
+                print(folders)
 
 
     if len(sys.argv) == 3:
