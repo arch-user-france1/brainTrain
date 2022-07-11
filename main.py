@@ -367,11 +367,27 @@ elif mode == "folders":
         else:
             print("---------------------FOLDERS---------------------")
             for i in folders:
-                print(folders)
+                output = i
+                nameLength = len(output)
+                if nameLength > 27:
+                    outputArr = output.split()
+                    output = ""
+                    for j, x in enumerate(outputArr):
+                        if j < 27:
+                            output += x
+                        else:
+                            break
+                    output += "..."
+                    nameLength = len(output)
 
+                spaces = 32 - nameLength
 
-    if len(sys.argv) == 3:
-        list_folders()
+                print(termcolor.colored(i, "blue"), end="")
+                for j in range(spaces):
+                    print(end=' ')
+                for o in folders[i]:
+                    print(termcolor.colored(str(o) + ',', "red"), end=" ")
+                print()
 
     mode = getArgument(2, "new, add, list")
 
