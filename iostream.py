@@ -68,24 +68,47 @@ class iostream():
                 string = ''
                 string += stringArr[0]
                 string = string.upper()
-                for i in range(len(stringArr)-1):
-                    string += stringArr[i+1]
+                for i in range(len(stringArr) - 1):
+                    string += stringArr[i + 1]
         return sentence, string
 
-    def checkAnswer(self, answer, correctAnswer):
+    def checkAnswer(self, answer, correctAnswer, removeSpaces):
         correct = True
         correctAnswer = self.tolerateSemicolon(correctAnswer)
-        if type(correctAnswer) == list:
-            isArray=True
-        else:
-            isArray=False
-        if isArray:
-            answer = self.tolerateSemicolon(answer)
 
+        # define your toleration script here
+        def tolerateSpaces(i):
+            """ toleration of too many or missing spaces """
+            if removeSpaces:
+                i = i.replace(' ', '')
+            return i
+
+        # add your toleration-definition into the following block
+        def toleration(defString):
+            defString = tolerateSpaces(defString)                          # remove all whitespaces
+
+            return defString
+
+        #  If the answer has a ; it will be converted into a list.
+        if type(correctAnswer) == list:
+            isList = True
+        else:
+            isList = False
+            answer = toleration(answer)
+            correctAnswer = toleration(correctAnswer)
+
+        if isList:
+            # modify the answer list
+            correctAnswerArr = []
+            for i in correctAnswer:
+                correctAnswerArr.append(toleration(i))
+            answer = self.tolerateSemicolon(answer)  # example: "proud; haughty" => ["proud", "haughty"]
             for i in answer:
-                if i not in correctAnswer:
+                i = toleration(i)
+                if i not in correctAnswerArr:
                     correct = False
                     break
+
         else:
             if answer != correctAnswer:
                 correct = False

@@ -8,16 +8,6 @@ import termcolor
 from time import sleep
 import random
 
-# import gi
-
-# gi.require_version('Gtk', '3.0')
-# from gi.repository import Gtk
-
-# win = Gtk.Window()
-# win.connect("destroy", Gtk.main_quit)
-# win.show()
-# Gtk.main()
-
 try:
     mode = sys.argv[1]
 except IndexError:
@@ -65,7 +55,7 @@ def setSetup(setName, set):
                 options.append(100)
             elif answer == "never_stop_asking":
                 options.append(101)
-            print("Ignore missing/too many spaces [yes/no]?  UNIMPLEMENTED")
+            print("Ignore spaces (character: ' ') [yes/no]?")
             answer = iostr.askFor(["yes", 'y', "no", 'n'], firstAsk=False)
             if answer == "yes" or "y":
                 options.append(True)
@@ -113,9 +103,9 @@ if mode == "train":
                     answer = iostr.tolerateSentence(answer, i)[1]
 
                 if not reversed_definitions:
-                    correct = iostr.checkAnswer(answer, set[i])
+                    correct = iostr.checkAnswer(answer, set[i], cards[setName]['options'][1])
                 else:
-                    correct = iostr.checkAnswer(answer, i)
+                    correct = iostr.checkAnswer(answer, i, cards[setName]['options'][1])
 
                 if correct:
                     if not reversed_definitions:
@@ -268,8 +258,8 @@ elif mode.lower() == "textfile":
     with open(sys.argv[2]) as f:
         for i in f:
             i = i.rstrip()
-            i = i.replace('’',
-                          "'")  # Apple software seems to replace the character ' with ’ but this doesn't seem to fix it.
+            i = i.replace('’', "'")
+                    # Apple software seems to replace the character ' with ’ but this doesn't seem to fix it (I'm not quite sure).
             if not last:
                 last = i
                 x += 1
