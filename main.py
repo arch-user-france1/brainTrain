@@ -362,7 +362,7 @@ elif mode == "folders":
                 print(termcolor.colored(output, "blue"), end="")
                 for j in range(spaces):
                     print(end=" ")
-                print(termcolor.colored(time.ctime(cards[i]['lastAccessed']), "green"))
+                print(termcolor.colored(time.ctime(cards[output]['lastAccessed']), "green"))
         else:
             print("---------------------FOLDERS---------------------")
             for i in folders:
@@ -399,8 +399,8 @@ elif mode == "folders":
         sys.exit(0)
 
     elif mode == "add":
-        folderName = getArgument(4, "the name of the folder")
-        setName = getArgument(3, "the name of the set")
+        folderName = getArgument(3, "the name of the folder")
+        setName = getArgument(4, "the name of the set")
         setSetup(setName, set=iostr.openDictionary(setName))
         print(f"adding {setName} to your folder {folderName}...")
         if folderName in cards[setName]['folders']:
