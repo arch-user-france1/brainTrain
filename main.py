@@ -41,7 +41,7 @@ def setSetup(setName, set):
             print("This set isn't configured yet, let's set it up.")
             options = []
             """
-            options[0]: reliability 
+            options[0]: reliability
             """
             print("How good do you want to be at the set?")
             answer = iostr.askFor(["bad", "medium", "good", "perfect", "never_stop_asking"])
@@ -93,26 +93,32 @@ if mode == "train":
                 try:
                     answer = input()
                 except UnicodeEncodeError:
-                    print("UnicodeDecodeError :/   try using a different shell or submit a PR")
+                    print(termcolor.colored("UnicodeDecodeError :/   try using a different shell or submit a PR", 'red'))
                     answer = ""
+
                 answer.replace('’',
                                '\'')  # Apple software seems to replace the character ' with ’ but it still doesn't seem to work if I replace it back :(
-                if not reversed_definitions:
-                    answer = iostr.tolerateSentence(answer, set[i])[1]
-                else:
-                    answer = iostr.tolerateSentence(answer, i)[1]
+                
 
                 if not reversed_definitions:
                     correct = iostr.checkAnswer(answer, set[i], cards[setName]['options'][1])
                 else:
                     correct = iostr.checkAnswer(answer, i, cards[setName]['options'][1])
 
+                correct, isChange = correct
                 if correct:
                     if not reversed_definitions:
-                        print(termcolor.colored(set[i], "green"))
+                        if isChange:
+                            print(termcolor.colored(set[i], "green"))
+                        else:
+                            print(termcolor.colored(set[i], "green"))
                     else:
-                        print(termcolor.colored(i, "green"))
+                        if isChange:
+                            print(termcolor.colored(i, "orange"))
+                        else:
+                            print(termcolor.colored(i, "green"))
                     print("Correct!")
+
                     cards[setName]['cardData'][i][0] += 1
                     if inLoop:
                         wrongAnswers.remove(i)
@@ -315,7 +321,10 @@ elif mode == "list":
         print(termcolor.colored(output, "blue"), end="")
         for j in range(spaces):
             print(end=" ")
-        print(termcolor.colored(time.ctime(cards[i]['lastAccessed']), "green"))
+        try:
+            print(termcolor.colored(time.ctime(cards[output]['lastAccessed']), "green"))
+        except Exception as err:
+            print("Error ", err, "line 325", i)
 
 elif mode == "folders":
     folders = iostr.openDictionary("folders")

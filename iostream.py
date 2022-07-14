@@ -1,8 +1,3 @@
-import io
-
-import numpy.core.defchararray
-
-
 class iostream():
     def addWords(self):
         words = {}
@@ -60,17 +55,17 @@ class iostream():
         return string
 
     def tolerateSentence(self, string, string2):
-        sentence = False
+        isSentence = False
         if '.' in string or '!' in string or '?' in string:
             if str(string2[0]).isupper():
-                sentence = True
+                isSentence = True
                 stringArr = list(string)
                 string = ''
                 string += stringArr[0]
                 string = string.upper()
                 for i in range(len(stringArr) - 1):
                     string += stringArr[i + 1]
-        return sentence, string
+        return isSentence, string
 
     def checkAnswer(self, answer, correctAnswer, removeSpaces):
         correct = True
@@ -83,28 +78,56 @@ class iostream():
                 i = i.replace(' ', '')
             return i
 
-        # add your toleration-definition into the following block
-        def toleration(defString):
-            defString = tolerateSpaces(defString)                          # remove all whitespaces
+        def tolerateMultipleSpaces(i):
+            """ toleration of more than one space: '  ' => ' ' """
+            self.space = False
+            self.iArr = list(i)
+            i = ''
+            for x in self.iArr:
+                if x == ' ':
+                    if not self.space:
+                        i += x
+                    else:
+                        self.space=True
+                else:
+                    self.space = False
+                    i += x
+            return i
 
-            return defString
+        # add your toleration-definition into the following block
+        def toleration(defString, isAnswer=False):
+            change = False
+            defStringOld = defString
+            ### ###
+            defString = tolerateSpaces(defString)                          # remove all whitespaces
+            defString = tolerateMultipleSpaces(defString)                  # remove multiple spaces
+
+            if isAnswer:
+                defString = self.tolerateSentence(defString, correctAnswer)[1]                # "hello world!" => "Hello world!"
+            ### ###
+
+            # Has the string changed?
+            if defString != defStringOld:
+                change = True
+
+            return [defString, change]
 
         #  If the answer has a ; it will be converted into a list.
         if type(correctAnswer) == list:
             isList = True
+            answer = self.tolerateSemicolon(answer)  # example: "proud; haughty" => ["proud", "haughty"]
+            answer, isChange = toleration(answer, isAnswer=True)
         else:
             isList = False
-            answer = toleration(answer)
-            correctAnswer = toleration(correctAnswer)
+            answer, isChange = toleration(answer, isAnswer=True)
+            correctAnswer = toleration(correctAnswer)[0]
 
         if isList:
             # modify the answer list
             correctAnswerArr = []
             for i in correctAnswer:
-                correctAnswerArr.append(toleration(i))
-            answer = self.tolerateSemicolon(answer)  # example: "proud; haughty" => ["proud", "haughty"]
+                correctAnswerArr.append(toleration(i)[0])
             for i in answer:
-                i = toleration(i)
                 if i not in correctAnswerArr:
                     correct = False
                     break
@@ -113,4 +136,4 @@ class iostream():
             if answer != correctAnswer:
                 correct = False
 
-        return correct
+        return [correct, isChange]
