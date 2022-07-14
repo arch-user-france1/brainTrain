@@ -117,7 +117,7 @@ if mode == "train":
                             print(termcolor.colored(i, "orange"))
                         else:
                             print(termcolor.colored(i, "green"))
-                    print("Correct!")
+                    print("Correct!\n")
 
                     cards[setName]['cardData'][i][0] += 1
                     if inLoop:
