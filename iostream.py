@@ -75,7 +75,12 @@ class iostream():
         def tolerateSpaces(i):
             """ toleration of too many or missing spaces """
             if removeSpaces:
-                i = i.replace(' ', '')
+                if type(i) == list:
+                    for count in range(len(i)):
+                        i[count] = i.replace(' ', '')
+                elif type(i) == string:
+                    i = i.replace(' ', '')
+
             return i
 
         def tolerateMultipleSpaces(i):
