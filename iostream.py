@@ -78,7 +78,7 @@ class iostream():
                 if type(i) == list:
                     for count in range(len(i)):
                         i[count] = i.replace(' ', '')
-                elif type(i) == string:
+                elif type(i) == str:
                     i = i.replace(' ', '')
 
             return i
