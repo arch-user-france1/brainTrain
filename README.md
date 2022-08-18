@@ -1,4 +1,4 @@
-# This thing is getting reworked - and going to be accessible using the browser.
+# This thing is getting reworked - and going to be accessible in the browser.
 I am currently using this core and flask for making a website.
 Not sure, if I will open-source anything anymore because it was a lot of work.
 My service should be free-of-charge though, maybe some premium features, but it should be usable without payment.
